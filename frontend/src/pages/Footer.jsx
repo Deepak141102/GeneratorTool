@@ -2,11 +2,12 @@ import React from 'react';
 import { MdOutlinePhoneInTalk,MdAttachEmail } from "react-icons/md";
 import { FaInstagram,FaLinkedin } from "react-icons/fa";
 import { RiTwitterXFill } from "react-icons/ri";
+import logo from "../assets/barabari_logo.png"
 
 const developers = [
   {
     name: "Drumil Akhenia",
-    image: "/src/assets/drumil.jpg",
+    image: "/assets/drumil.jpg",
     linkedin: "https://www.linkedin.com/in/drumil-akhenia/",
   }
 ];
@@ -43,7 +44,7 @@ const Footer = () => {
         <div className="information flex flex-col  justify-between items-start md:items-center">
           <div className="pagesContainer mb-6 md:mb-0 md:text-left flex items-center flex-col gap-4 mx-auto">
             <div className="footer-logo flex items-center justify-center md:justify-start mb-4">
-              <img src="/src/barabari_logo.png" alt="Rozgar" className="w-12 h-12 mr-2" />
+              <img src={logo} alt="Rozgar" className="w-12 h-12 mr-2" />
               <h2 className="text-xl font-extrabold text-[#f9f9f9]">Barabari Collective</h2>
             </div>
             <ul className="contact-info space-y-2">
