@@ -9,7 +9,7 @@
     },
     "include": [
         "src/**/*",
-        "src/index.ts",
+        "src/index.js",
         "custom.d.ts",
     ]
 }

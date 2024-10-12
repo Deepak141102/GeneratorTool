@@ -9,8 +9,6 @@ const PublicRoute = ({ email, children }) => {
         }
     }, [email])
 
-    console.log(children)
-
     return <>{children}</>;
 }
 

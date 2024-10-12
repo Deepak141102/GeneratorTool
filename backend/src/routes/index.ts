@@ -5,13 +5,16 @@ import { readDataAndSendMailForRaksha, readDataAndSendMailForSOS } from "../util
 const router = Router();
 
 router.post('/', async (req: Request, res: Response, next: NextFunction) => {
+    if( !req.user ){
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
     const encryptedData = req.body.encryptedData;
     const {
         startingRowNo,
         fileData,
-        email,
         ccEmails,
         password } = decryptData(encryptedData);
+    const email = req.user.emails[0].value
     try {
         if (email == process.env.SOS_EMAIL) {
             await readDataAndSendMailForSOS(startingRowNo, fileData, email, ccEmails, password);

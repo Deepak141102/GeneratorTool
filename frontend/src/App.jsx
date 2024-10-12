@@ -16,7 +16,7 @@ function App() {
 
   const Layout = () => (
     <>
-      <Hero setEmail={setEmail} email={email}/>
+      <Hero setEmail={setEmail} email={email} />
       <main>
         <Outlet /> {/* Outlet will render the appropriate route content */}
       </main>
@@ -41,7 +41,7 @@ function App() {
           path: "/home",
           element: (
             <ProtectedRoute email={email}>
-              <Home />
+              <Home email={email} setEmail={setEmail} />
             </ProtectedRoute>
           ),
         },
