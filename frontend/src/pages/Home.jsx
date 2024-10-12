@@ -122,7 +122,7 @@ const Home = () => {
     useEffect(() => {
         const awakeServer = async () => {
             try {
-                await axios.get(`${import.meta.env.VITE_BACKEND_BASE_URL}/health`,{
+                await axios.get(`${import.meta.env.VITE_BACKEND_BASE_URL}/health`, {
                     withCredentials: true,
                 });
             } catch (error) {
@@ -334,19 +334,23 @@ const Home = () => {
 
     return (
         <div className={styles.appContainer}>
-            <div className={styles.appBar}>
-                <img src={logo} alt="Logo" className={styles.logo} />
-                <h1 className={styles.title}>
-                    Save Our Strays x Barabari Donation Receipt Generator
-                </h1>
+            <div className="absolute inset-0 z-0">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-900 to-blue-600 opacity-90 animate-background" />
+                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1440 320">
+                    <polygon fill="rgba(255, 255, 255, 0.1)" points="0,320 1440,320 1440,0 0,0" />
+                    <polygon fill="rgba(255, 255, 255, 0.15)" points="200,320 1240,160 1440,0 0,160" />
+                </svg>
+                <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-purple-700 to-transparent opacity-70 animate-wave" />
             </div>
 
-            <div className={styles.formContainer}>
+            <div className={`${styles.formContainer} relative z-10 bg-gray-800 p-10 rounded-xl shadow-xl max-w-lg w-full backdrop-blur-md bg-opacity-60  flex flex-col justify-center items-center space-y-4 mt-[4rem]`}>
                 <div className={styles.formBox}>
                     <Input
                         placeholder="Email Id"
                         type="email"
                         name="email"
+                        className="input-sec"
+
                         value={inputState.email}
                         onChange={(e) =>
                             dispatchInput({
@@ -363,6 +367,8 @@ const Home = () => {
                         placeholder="Password"
                         type="password"
                         name="password"
+                        className="input-sec"
+
                         value={inputState.password}
                         onChange={(e) =>
                             dispatchInput({
@@ -383,6 +389,8 @@ const Home = () => {
                         placeholder="Starting Row"
                         type="number"
                         name="starting"
+                        className="input-sec"
+
                         value={inputState.starting}
                         onChange={(e) =>
                             dispatchInput({
@@ -397,6 +405,7 @@ const Home = () => {
                     />
                     <Input
                         placeholder="Ending Row"
+                        className="input-sec"
                         type="number"
                         name="ending"
                         value={inputState.ending}
@@ -411,16 +420,18 @@ const Home = () => {
                         errorMessage={errorState.endingError}
                         icon={<LuListEnd />}
                     />
+
                     <div className={styles.fileInputContainer}>
                         {inputState.fileName && (
-                            <div className={styles.fileName}>{inputState.fileName}</div>
+                            <div className={`${styles.fileName}`}>{inputState.fileName}</div>
                         )}
-                        <label htmlFor="file">Upload File</label>
+                        <label htmlFor="file" className="file-label">Upload File</label>
                         <input
                             id="file"
                             type="file"
                             accept=".xlsx, .xls"
                             onChange={handleFileChange}
+                            className="file:mr-4 file:py-2 hidden file:px-4 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white hover:file:bg-purple-700 futuristic-file-input"
                         />
                     </div>
                     <button
@@ -442,41 +453,73 @@ const Home = () => {
                         )}
                     </button>
                 </div>
+                <style>{`
+            @keyframes background {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+    
+            @keyframes wave {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+            }
+    
+            .animate-background {
+                background: linear-gradient(270deg, #3b007f, #0c0e32);
+                background-size: 400% 400%;
+                animation: background 20s ease infinite;
+            }
+    
+            .animate-wave {
+                animation: wave 10s linear infinite;
+            }
+    
+            .input-sec {
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                backdrop-filter: blur(15px);
+                color: white;
+                // padding: 8px;
+                border-radius: 12px;
+                margin-bottom: 11px;
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+                transition: all 0.3s ease;
+            }
+    
+            .input-sec:focus {
+                outline: none;
+                border-color: #6a00f4;
+                box-shadow: 0 0 20px rgba(106, 0, 244, 0.8);
+            }
+    
+            .futuristic-file-text {
+                color: rgba(255, 255, 255, 0.8);
+            }
+    
+            .futuristic-file-label {
+                color: rgba(255, 255, 255, 0.5);
+                transition: color 0.3s ease;
+            }
+    
+            .futuristic-file-label:hover {
+                color: rgba(255, 255, 255, 0.9);
+            }
+    
+            .futuristic-button {
+                box-shadow: 0 4px 15px rgba(106, 0, 244, 0.4);
+            }
+    
+            .futuristic-button:hover {
+                box-shadow: 0 6px 25px rgba(106, 0, 244, 0.6);
+            }
+    
+            .glow-text {
+                text-shadow: 0 0 20px rgba(106, 0, 244, 0.7), 0 0 30px rgba(106, 0, 244, 0.5);
+            }
+        `}</style>
             </div>
-            <footer className={styles.footer}>
-                <p>© {new Date().getFullYear()} Barabari Collective Developers.</p>
-                <p>
-                    Built By
-                    <a
-                        href="https://www.linkedin.com/in/drumil-akhenia/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.footerLink}
-                    >
-                        Drumil Akhenia
-                    </a>
-                    &nbsp; & &nbsp;
-                    <a
-                        href="https://www.linkedin.com/in/deepak-undefined-8a68a927a/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.footerLink}
-                    >
-                        Deepak Sagar
-                    </a>
-                </p>
-                <p>
-                    Want us to build something for you?
-                    <a
-                        href="https://www.barabariproject.org/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.footerLink}
-                    >
-                        Contact us
-                    </a>
-                </p>
-            </footer>
+
             <ToastContainer
                 autoClose={7000}
                 newestOnTop={true}
