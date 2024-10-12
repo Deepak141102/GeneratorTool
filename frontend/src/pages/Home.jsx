@@ -254,13 +254,7 @@ const Home = () => {
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
 
-            const jsonData = XLSX.utils.sheet_to_json(worksheet
-                // ,
-                //    {
-                //   raw: false,  // This ensures dates are parsed to JS date objects
-                //   dateNF: 'mm-dd-yyyy',  // Define date format
-                // }
-            );
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
             const ExcelDateToJSDate = (date) => {
 
                 let convertedDate = new Date(Math.round((date - 25569) * 864e5));
@@ -281,8 +275,7 @@ const Home = () => {
             const starting = Number(inputState.starting);
             const ending = Number(inputState.ending);
             const selectedRows = jsonData.slice(starting - 2, ending - 1);
-            console.log(selectedRows.length);
-            console.log(ending - starting + 1);
+            
             if (selectedRows.length == 0 || selectedRows.length != ((ending - starting) + 1)) {
                 toast.error('Please Select a valid starting and ending row');
                 return;

@@ -9,9 +9,9 @@ import Hero from './pages/Hero.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     {/* <GoogleOAuthProvider clientId={googleClientId}> */}
-    <Hero/>
+    {/* <Hero/> */}
       <App />
-    <Footer/>
+    {/* <Footer/> */}
     {/* </GoogleOAuthProvider> */}
   </StrictMode>,
 )

@@ -3,10 +3,6 @@ import { MdOutlinePhoneInTalk,MdAttachEmail } from "react-icons/md";
 import { FaInstagram,FaLinkedin } from "react-icons/fa";
 import { RiTwitterXFill } from "react-icons/ri";
 
-
-
-
-
 const developers = [
   {
     name: "Drumil Akhenia",

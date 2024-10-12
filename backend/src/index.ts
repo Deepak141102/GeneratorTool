@@ -132,7 +132,7 @@ const server = app.listen(PORT, () => {
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     logger.error(err);
     logger.error(err.message);
-    res.status(500).send('Internal Server Error');
+    res.redirect(`${process.env.FRONTEND_BASE_URL}`);
 });
 
 // Handle uncaught exceptions
