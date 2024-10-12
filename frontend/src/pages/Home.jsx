@@ -3,7 +3,7 @@ import axios from "axios";
 import * as XLSX from 'xlsx';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import logo from "../barabari_logo.png";
+import logo from "../assets/barabari_logo.png";
 import styles from "./Home.module.scss";
 import Input from "../components/Input/Input";
 import { MdEmail } from "react-icons/md";

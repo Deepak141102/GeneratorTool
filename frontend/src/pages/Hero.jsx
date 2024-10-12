@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React from 'react'
-import { Navigate, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
+import logo from '../assets/barabari_logo.png'
 
 const Hero = ({ setEmail,email }) => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const Hero = ({ setEmail,email }) => {
         <div className="flex gap-2 items-center">
           <a href="index.html">
             <img
-              src="/src/barabari_logo.png"
+              src={logo}
               className="drop-shadow-lg w-[40px] h-[40px] cursor-pointer"
               alt="Barabari Logo"
             />
