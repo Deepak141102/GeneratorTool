@@ -44,11 +44,8 @@ passport.use(new GoogleStrategy({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: '/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
-    const userData = profile._json;
-    if (process.env.SOS_EMAIL == userData.email || process.env.RAKSHA_EMAIL == userData.email) {
-        return done(null, profile);
-    }
-    done(new Error('Invalid Authentication'), false, 'Invalid Authentication');
+    // Removing the email restriction, allowing all Google users to authenticate
+    return done(null, profile);
 }));
 
 passport.serializeUser((user, done) => {

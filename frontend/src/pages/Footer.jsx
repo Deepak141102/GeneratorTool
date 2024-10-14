@@ -9,6 +9,11 @@ const developers = [
     name: "Drumil Akhenia",
     image: "/assets/drumil.jpg",
     linkedin: "https://www.linkedin.com/in/drumil-akhenia/",
+  },
+  {
+    name: "Deepak Sagar",
+    image: "/assets/deepak.jpg",
+    linkedin: "https://www.linkedin.com/in/deepak-sagar1/",
   }
 ];
 
