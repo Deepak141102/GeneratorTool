@@ -47,7 +47,7 @@ app.use(passport.session());
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID!, // Google Client ID from environment variable
     clientSecret: process.env.GOOGLE_CLIENT_SECRET!, // Google Client Secret from environment variable
-    callbackURL: `${process.env.BACKEND_BASE_URL}/auth/google/callback`, // Backend callback URL
+    callbackURL: `https://genbackend.onrender.com/auth/google/callback`, // Ensure this matches Google Console
 }, (accessToken, refreshToken, profile, done) => {
     return done(null, profile); // Return the user profile from Google
 }));
