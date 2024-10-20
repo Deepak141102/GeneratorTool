@@ -28,7 +28,7 @@ app.use(
     session({
         secret: process.env.COOKIE_SECRET || 'secret', // Secret key for signing the session ID cookie
         cookie: {
-            secure: process.env.NODE_ENV === "production" ? true : "auto", // Secure cookies in production
+            secure: process.env.NODE_ENV === "production", // Secure cookies in production
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Cookie policy based on environment
             maxAge: 30 * 24 * 60 * 60 * 1000, // Session valid for 30 days
         },
@@ -54,7 +54,6 @@ passport.use(new GoogleStrategy({
     // Your authentication logic
     return done(null, profile);
 }));
-
 
 // Serialize user to store user data in session
 passport.serializeUser((user, done) => {
@@ -92,8 +91,6 @@ app.get('/health', (req: Request, res: Response) => {
     }
     res.sendStatus(200); // Return OK status if authenticated
 });
-
-app.use(routes); // Include other routes from routes/index.js
 
 // Route to initiate Google OAuth login
 app.get("/auth/google",
