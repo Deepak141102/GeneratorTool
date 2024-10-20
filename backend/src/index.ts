@@ -40,6 +40,11 @@ app.use(
 app.use(passport.initialize()); // Initialize Passport for authentication
 app.use(passport.session()); // Enable persistent login sessions
 
+// Add a root route to respond to GET requests at '/'
+app.get('/', (req: Request, res: Response) => {
+    res.send('Welcome to the backend API!'); // You can customize this message
+});
+
 // Google OAuth strategy configuration
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID || '', // Google OAuth Client ID from environment
