@@ -12,56 +12,57 @@ dotenv.config();
 const app = express();
 const PORT: number = parseInt(process.env.PORT || '3000');
 
-// CORS Configuration
+// Configure CORS to allow credentials and specify the frontend origin
 app.use(
     cors({
         credentials: true,
-        origin: process.env.FRONTEND_BASE_URL, // Use your frontend base URL
-        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        origin: process.env.FRONTEND_BASE_URL, // Frontend URL from environment variable
+        methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
     })
 );
 
+// Parse incoming requests with JSON and URL-encoded payloads
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Session Configuration
+// Configure session middleware to manage user sessions
 app.use(
     session({
-        secret: process.env.COOKIE_SECRET!,
+        secret: process.env.COOKIE_SECRET!, // Session secret from environment variable
         cookie: {
-            secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // None for cross-origin requests
-            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+            secure: process.env.NODE_ENV === "production", // Secure cookies in production
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Cross-domain handling
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days expiry
         },
         resave: false,
         saveUninitialized: false,
     })
 );
 
+// Initialize Passport.js for authentication
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Google OAuth Strategy
+// Configure Google OAuth strategy for Passport
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID!,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    callbackURL: `https://genbackend.onrender.com/auth/google/callback`, // Ensure this matches Google Console
+    clientID: process.env.GOOGLE_CLIENT_ID!, // Google Client ID from environment variable
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET!, // Google Client Secret from environment variable
+    callbackURL: `${process.env.BACKEND_BASE_URL}/auth/google/callback`, // Backend callback URL
 }, (accessToken, refreshToken, profile, done) => {
-    // Save or update user info in database here if needed
-    return done(null, profile);
+    return done(null, profile); // Return the user profile from Google
 }));
 
-// Serialize user into session
-passport.serializeUser((user: any, done) => {
+// Serialize user information into session
+passport.serializeUser((user, done) => {
     done(null, user);
 });
 
-// Deserialize user from session
-passport.deserializeUser((obj: any, done) => {
+// Deserialize user information from session
+passport.deserializeUser((obj, done) => {
     done(null, obj);
 });
 
-// Logger setup using Winston
+// Winston logger configuration for request logging
 export const logger = winston.createLogger({
     level: "info",
     format: winston.format.combine(
@@ -76,13 +77,13 @@ export const logger = winston.createLogger({
     ],
 });
 
-// Logging middleware
+// Logging middleware for all requests
 app.use((req: Request, res: Response, next: NextFunction) => {
     logger.info(`Received a ${req.method} request for ${req.url}`);
     next();
 });
 
-// Health check route
+// Health check route to ensure the server is running
 app.get('/health', (req: Request, res: Response) => {
     if (!req.user) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -90,9 +91,10 @@ app.get('/health', (req: Request, res: Response) => {
     res.sendStatus(200);
 });
 
+// Mount application routes
 app.use(routes);
 
-// Google OAuth Routes
+// Route for Google OAuth login
 app.get("/auth/google",
     passport.authenticate("google", {
         scope: [
@@ -102,16 +104,19 @@ app.get("/auth/google",
     })
 );
 
-// Google OAuth Callback
+// OAuth callback route for Google login
 app.get('/auth/google/callback',
-    passport.authenticate("google", { session: true, failureRedirect: '/login' }),
+    passport.authenticate("google", {
+        session: true,
+        failureRedirect: '/login', // Redirect to login page on failure
+    }),
     (req, res) => {
-        // Redirect after successful login
+        // Redirect to the frontend base URL on successful login
         res.redirect(`${process.env.FRONTEND_BASE_URL}`);
     }
 );
 
-// Logout Route
+// Route to log out and destroy the session
 app.get('/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) return next(err);
@@ -119,7 +124,7 @@ app.get('/logout', (req, res, next) => {
     });
 });
 
-// Route to get current logged-in user profile
+// Route to get the authenticated user's profile
 app.get('/user', (req, res) => {
     if (!req.user) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -132,13 +137,14 @@ const server = app.listen(PORT, () => {
     logger.info(`Server listening at http://localhost:${PORT}`);
 });
 
-// Global Error Handling Middleware
+// Global error handler to log errors and redirect to frontend
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    logger.error(err);
     logger.error(err.message);
-    res.status(500).json({ error: 'An error occurred, please try again later.' });
+    res.redirect(`${process.env.FRONTEND_BASE_URL}`);
 });
 
-// Handle uncaught exceptions
+// Handle uncaught exceptions and shut down the server gracefully
 process.on('uncaughtException', (err) => {
     logger.error('Uncaught Exception:', err);
     server.close(() => {
