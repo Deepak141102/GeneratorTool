@@ -42,11 +42,12 @@ app.use(passport.session());
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/google/callback'
-}, (accessToken, refreshToken, profile, done) => {
-    // Removing the email restriction, allowing all Google users to authenticate
-    return done(null, profile);
-}));
+    callbackURL: "https://my-frontend.onrender.com/auth/google/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    // Authentication logic
+  }));
+  
 
 passport.serializeUser((user, done) => {
     done(null, user);
