@@ -47,13 +47,14 @@ app.get('/', (req: Request, res: Response) => {
 
 // Google OAuth strategy configuration
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID || '', // Google OAuth Client ID from environment
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || '', // Google OAuth Client Secret from environment
-    callbackURL: `${process.env.BACKEND_BASE_URL}/auth/google/callback`, // Redirect URL after Google login
+    clientID: process.env.GOOGLE_CLIENT_ID || '',
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    callbackURL: `${process.env.BACKEND_BASE_URL}/auth/google/callback`, // Ensure this matches
 }, (accessToken, refreshToken, profile, done) => {
-    // Successful authentication, return user profile
+    // Your authentication logic
     return done(null, profile);
 }));
+
 
 // Serialize user to store user data in session
 passport.serializeUser((user, done) => {
