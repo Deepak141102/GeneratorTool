@@ -12,23 +12,26 @@ dotenv.config();
 const app = express();
 const PORT: number = parseInt(process.env.PORT || '3000');
 
+// CORS Configuration
 app.use(
     cors({
         credentials: true,
-        origin: process.env.FRONTEND_BASE_URL
+        origin: process.env.FRONTEND_BASE_URL, // Use your frontend base URL
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
     })
 );
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Session Configuration
 app.use(
     session({
-        secret: process.env.COOKIE_SECRET,
+        secret: process.env.COOKIE_SECRET!,
         cookie: {
-            secure: process.env.NODE_ENV === "production" ? true : "auto",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            maxAge: 30 * 24 * 60 * 60 * 1000,
+            secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // None for cross-origin requests
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
         },
         resave: false,
         saveUninitialized: false,
@@ -38,24 +41,27 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Configure Passport with Google OAuth strategy
+// Google OAuth Strategy
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: `https://genbackend.onrender.com/auth/google/callback`, // Updated URL to match Google Console
+    clientID: process.env.GOOGLE_CLIENT_ID!,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    callbackURL: `https://genbackend.onrender.com/auth/google/callback`, // Ensure this matches Google Console
 }, (accessToken, refreshToken, profile, done) => {
+    // Save or update user info in database here if needed
     return done(null, profile);
 }));
 
-
-passport.serializeUser((user, done) => {
+// Serialize user into session
+passport.serializeUser((user: any, done) => {
     done(null, user);
 });
 
-passport.deserializeUser((obj, done) => {
+// Deserialize user from session
+passport.deserializeUser((obj: any, done) => {
     done(null, obj);
 });
 
+// Logger setup using Winston
 export const logger = winston.createLogger({
     level: "info",
     format: winston.format.combine(
@@ -70,11 +76,13 @@ export const logger = winston.createLogger({
     ],
 });
 
+// Logging middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
     logger.info(`Received a ${req.method} request for ${req.url}`);
     next();
 });
 
+// Health check route
 app.get('/health', (req: Request, res: Response) => {
     if (!req.user) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -84,7 +92,7 @@ app.get('/health', (req: Request, res: Response) => {
 
 app.use(routes);
 
-// Routes for Google authentication
+// Google OAuth Routes
 app.get("/auth/google",
     passport.authenticate("google", {
         scope: [
@@ -94,14 +102,16 @@ app.get("/auth/google",
     })
 );
 
+// Google OAuth Callback
 app.get('/auth/google/callback',
-    passport.authenticate("google", { session: true }),
+    passport.authenticate("google", { session: true, failureRedirect: '/login' }),
     (req, res) => {
+        // Redirect after successful login
         res.redirect(`${process.env.FRONTEND_BASE_URL}`);
     }
 );
 
-// Route to log out
+// Logout Route
 app.get('/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) return next(err);
@@ -109,7 +119,7 @@ app.get('/logout', (req, res, next) => {
     });
 });
 
-// Route to get user profile
+// Route to get current logged-in user profile
 app.get('/user', (req, res) => {
     if (!req.user) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -117,14 +127,15 @@ app.get('/user', (req, res) => {
     res.json(req.user);
 });
 
+// Start the server
 const server = app.listen(PORT, () => {
     logger.info(`Server listening at http://localhost:${PORT}`);
 });
 
+// Global Error Handling Middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    logger.error(err);
     logger.error(err.message);
-    res.redirect(`${process.env.FRONTEND_BASE_URL}`);
+    res.status(500).json({ error: 'An error occurred, please try again later.' });
 });
 
 // Handle uncaught exceptions
