@@ -10,31 +10,35 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 dotenv.config();
 
 const app = express();
-const PORT: number = parseInt(process.env.PORT || '3000');
+const PORT: number = parseInt(process.env.PORT || '3000', 10);
 
+// Middleware for CORS
 app.use(
     cors({
         credentials: true,
-        origin: process.env.FRONTEND_BASE_URL
+        origin: process.env.FRONTEND_BASE_URL,
     })
 );
 
+// Middleware for parsing JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware for sessions
 app.use(
     session({
-        secret: [process.env.COOKIE_SECRET],
+        secret: process.env.COOKIE_SECRET || 'default_secret',
         cookie: {
-            secure: process.env.NODE_ENV === "production" ? true : "auto",
+            secure: process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            maxAge: 30 * 24 * 60 * 60 * 1000,
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
         },
         resave: false,
         saveUninitialized: false,
     })
 );
 
+// Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -44,9 +48,9 @@ passport.use(new GoogleStrategy({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     callbackURL: `${process.env.BACKEND_BASE_URL}/auth/google/callback`,
 }, (accessToken, refreshToken, profile, done) => {
+    // Here you can save the user profile in your database if needed
     return done(null, profile);
 }));
-
 
 passport.serializeUser((user, done) => {
     done(null, user);
@@ -56,29 +60,26 @@ passport.deserializeUser((obj, done) => {
     done(null, obj);
 });
 
+// Logger configuration
 export const logger = winston.createLogger({
-    // Log only if level is less than (meaning more severe) or equal to this
     level: "info",
-    // Use timestamp and printf to create a standard log format
     format: winston.format.combine(
         winston.format.timestamp(),
-        winston.format.printf(
-            (data) => `${data.timestamp} ${data.level}: ${data.message}`
-        )
+        winston.format.printf((data) => `${data.timestamp} ${data.level}: ${data.message}`)
     ),
-    // Log to the console and a file
     transports: [
         new winston.transports.Console(),
         new winston.transports.File({ filename: "logs/app.log" }),
     ],
 });
 
+// Logging middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
-    // Log an info message for each incoming request
     logger.info(`Received a ${req.method} request for ${req.url}`);
     next();
 });
 
+// Health check route
 app.get('/health', (req: Request, res: Response) => {
     if (!req.user) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -86,9 +87,10 @@ app.get('/health', (req: Request, res: Response) => {
     res.sendStatus(200);
 });
 
+// Use your defined routes
 app.use(routes);
 
-// Routes for Google authentication
+// Google authentication routes
 app.get("/auth/google",
     passport.authenticate("google", {
         scope: [
@@ -109,7 +111,6 @@ app.get('/auth/google/callback',
 app.get('/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) return next(err);
-        // Broadcast logout event to other tabs
         res.status(200).json({ message: 'Logged out successfully!' });
     });
 });
@@ -122,20 +123,29 @@ app.get('/user', (req, res) => {
     res.json(req.user);
 });
 
+// Start the server
 const server = app.listen(PORT, () => {
     logger.info(`Server listening at http://localhost:${PORT}`);
 });
 
+// Global error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     logger.error(err);
     logger.error(err.message);
-    res.redirect(`${process.env.FRONTEND_BASE_URL}`);
+    res.status(500).json({ error: 'Something went wrong!' });
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
-    // Gracefully close the server and then exit
     logger.error('Uncaught Exception:', err);
+    server.close(() => {
+        process.exit(1);
+    });
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason) => {
+    logger.error('Unhandled Rejection:', reason);
     server.close(() => {
         process.exit(1);
     });
